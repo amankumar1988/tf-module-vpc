@@ -26,7 +26,7 @@ resource "aws_route_table_association" "public-rt-association" {
 }
 
 
-# Create public route tables
+# Create Private route tables
 resource "aws_route_table" "private-rt" {
   vpc_id = aws_vpc.main.id
 
@@ -43,4 +43,12 @@ resource "aws_route_table" "private-rt" {
   tags = {
     Name = "roboshop-${var.ENV}-private-rt"
   }
+}
+
+# Attach public rt with subnets
+
+resource "aws_route_table_association" "private-rt-association" {
+  count =  length (aws_subnet.private_subnet.*.id)
+  subnet_id      = element(aws_subnet.private_subnet.*.id, count.index)
+  route_table_id = aws_route_table.private-rt.id
 }
